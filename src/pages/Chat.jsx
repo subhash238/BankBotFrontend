@@ -1,13 +1,14 @@
 import React from "react";
-import { useEffect, useRef,useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // import { useState } from "react";
 import MessageBubble from "../components/MessageBubble";
 import axios from "axios";
-
+import Loader from "../components/Loader";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(true);
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function Chat() {
     }
   }, [messages]);
   const sendMessage = async () => {
+    setLoading(true);
     if (!input.trim()) return;
     const updatedMessages = [...messages, { role: "user", content: input }];
     setMessages(updatedMessages);
@@ -32,7 +34,11 @@ export default function Chat() {
       //   ...prev,
       //   { sender: "assistant", text: res.data[0]?.text || "No response." },
       // ]);
-       setMessages([...updatedMessages, { role: "assistant", content: res.data[0]?.text || "No response." }]);
+      setMessages([
+        ...updatedMessages,
+        { role: "assistant", content: res.data[0]?.text || "No response." },
+      ]);
+      setLoading(false);
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
@@ -42,6 +48,7 @@ export default function Chat() {
           text: "Something went wrong. Please try again.",
         },
       ]);
+      setLoading(false);
     }
   };
 
@@ -56,20 +63,25 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col h-full">
-      <div ref={chatContainerRef} className="overflow-y-auto h-[500px] px-4 py-2">
+      <div
+        ref={chatContainerRef}
+        className="overflow-y-auto h-[500px] px-4 py-2"
+      >
         {messages.map((msg, i) => (
           <MessageBubble
             key={i}
             sender={msg.role}
             text={msg.content}
             onEdit={() => editMessage(i)}
+            loading={loading && i === messages.length - 1}
           />
         ))}
+        
       </div>
       <div className="p-4 border-t">
         <textarea
           rows={1}
-          className="w-full p-4 rounded dark:bg-gray-800 dark:text-white"
+          className="w-full border border-gray-300 p-4 rounded dark:bg-gray-800 dark:text-white"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."

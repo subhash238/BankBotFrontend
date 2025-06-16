@@ -2,7 +2,7 @@ import React from "react";
 
 const ChatSidebar = ({ history, onNewChat, onSelectChat }) => {
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 p-4 space-y-4 mt-4">
+    <div className="bg-gray-100 dark:bg-gray-800 p-4 space-y-4 mt-4 h-100">
       <button
         onClick={onNewChat}
         className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
